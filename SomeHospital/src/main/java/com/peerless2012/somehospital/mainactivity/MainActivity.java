@@ -1,5 +1,6 @@
 package com.peerless2012.somehospital.mainactivity;
 
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,7 +16,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.arlib.floatingsearchview.FloatingSearchView;
 import com.peerless2012.somehospital.R;
+import com.peerless2012.somehospital.map.MapActivity;
 import com.peerless2012.somehospital.model.HospitalInfo;
 import java.util.List;
 
@@ -35,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private MainContract.Presenter mMPresenter;
     private MainAdapter mMainAdapter;
+    private FloatingSearchView mSearchView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +55,14 @@ public class MainActivity extends AppCompatActivity implements
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        FloatingActionButton mFloatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MapActivity.launch(MainActivity.this);
+            }
+        });
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         mRecyclerView = (RecyclerView) findViewById(R.id.content_recycle_view);
@@ -99,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
         if (id == R.id.nav_camera) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {

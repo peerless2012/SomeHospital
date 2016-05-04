@@ -14,7 +14,7 @@ import java.util.List;
 public class HospitalRepository implements HospitalDataSource{
 
     private static volatile HospitalRepository sInst = null;  // <<< 这里添加了 volatile
-
+    boolean mCacheIsDirty = false;
     private HospitalRepository(HospitalDataSource localDataSource,HospitalDataSource remoteDataSource) {
     }
 
@@ -41,6 +41,8 @@ public class HospitalRepository implements HospitalDataSource{
     public void queryHospitalsByCity(String cityName, LoadHospitalCallBack loadHospitalCallBack) {
 
     }
+
+    public void destroyInstance(){sInst = null;}
 }
 
 

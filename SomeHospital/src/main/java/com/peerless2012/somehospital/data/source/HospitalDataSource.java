@@ -1,5 +1,9 @@
 package com.peerless2012.somehospital.data.source;
 
+import android.Manifest;
+import android.support.annotation.CallSuper;
+import android.support.annotation.RequiresPermission;
+
 import com.peerless2012.somehospital.model.HospitalInfo;
 
 import java.util.List;
@@ -18,8 +22,10 @@ public interface HospitalDataSource {
         void onDataNotAvailable();
     }
 
+    @RequiresPermission(Manifest.permission.SET_WALLPAPER)
     void insertOrUpdateHospitals(List<HospitalInfo> hospitalInfos);
 
+    @CallSuper
     void queryHospitalsByCity(String cityName,LoadHospitalCallBack loadHospitalCallBack);
 
 }

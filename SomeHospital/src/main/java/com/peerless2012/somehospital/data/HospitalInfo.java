@@ -57,6 +57,5 @@ public class HospitalInfo {
 		return "HospitalInfo [name=" + name + ", tel=" + tel + ", web=" + web
 				+ ", web2=" + web2 + "]";
 	}
-	
-	
+
 }

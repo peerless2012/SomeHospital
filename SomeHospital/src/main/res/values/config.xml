@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="db_version">https://raw.githubusercontent.com/peerless2012/SomeHospital/master/data/DbVersion.json</string>
+    <string name="db_url">https://raw.githubusercontent.com/peerless2012/SomeHospital/master/data/DbVersion.json</string>
+</resources>

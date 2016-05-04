@@ -27,6 +27,17 @@
             android:name=".Service.SyncService"
             android:exported="false">
         </service>
+
+        <activity
+            android:name=".map.MapActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_map"
+            android:parentActivityName=".mainactivity.MainActivity"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.peerless2012.somehospital.mainactivity.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

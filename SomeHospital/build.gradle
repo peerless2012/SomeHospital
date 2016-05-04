@@ -24,12 +24,16 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile rootProject.ext.libSupportAppcompat
     compile rootProject.ext.libSupportDesign
-    compile 'com.github.orhanobut:logger:1.12'
     //compile 'com.zhy:okhttputils:2.4.1'
-    compile 'io.reactivex:rxandroid:1.1.0'
     // Because RxAndroid releases are few and far between, it is recommended you also
     // explicitly depend on RxJava's latest version for bug fixes and new features.
+    
+
+    compile 'com.github.orhanobut:logger:1.12'
+    compile 'io.reactivex:rxandroid:1.1.0'
     compile 'io.reactivex:rxjava:1.1.0'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.squareup.okio:okio:1.8.0'
+    compile 'com.github.arimorty:floatingsearchview:1.1.2'
+    compile 'com.android.support:support-v4:23.3.0'
 }
