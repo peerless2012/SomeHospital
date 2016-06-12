@@ -26,4 +26,12 @@
         app:floatingSearch_searchHint="Search..."
         app:floatingSearch_showSearchKey="false"/>
 
+    <com.peerless2012.somehospital.widget.MapControl
+        android:id="@+id/map_control"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="right|center_vertical"/>
+
 </FrameLayout>

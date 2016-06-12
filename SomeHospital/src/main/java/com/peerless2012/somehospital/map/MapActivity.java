@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+import android.widget.ZoomButtonsController;
+import android.widget.ZoomControls;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -23,6 +25,7 @@ import com.amap.api.maps.model.MyLocationStyle;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.peerless2012.somehospital.R;
 import com.peerless2012.somehospital.base.BaseActivity;
+import com.peerless2012.somehospital.widget.MapControl;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -45,6 +48,9 @@ public class MapActivity extends BaseActivity
 
     private AMapLocationClientOption mLocationOption;
 
+
+    private MapControl mMapControl;
+
     @Override
     protected int getContentLayout() {
         return R.layout.activity_map;
@@ -57,12 +63,13 @@ public class MapActivity extends BaseActivity
         mFloatSearchView = getView(R.id.floating_search_view);
         mMapView.onCreate(null);
         mAMap = mMapView.getMap();
+        mMapControl = getView(R.id.map_control);
         setUpMap();
     }
 
     @Override
     protected void initListener() {
-
+        mAMap.getMaxZoomLevel();
     }
 
     @Override
@@ -127,6 +134,7 @@ public class MapActivity extends BaseActivity
     @Override
     protected void onDestroy() {
         mMapView.onDestroy();
+        mMapControl.detachMap();
         mAMap.setMyLocationEnabled(false);
         super.onDestroy();
     }
@@ -190,6 +198,7 @@ public class MapActivity extends BaseActivity
     @Override
     public void onMapLoaded() {
         mAMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+        mMapControl.attachMap(mAMap);
     }
 
     @Override
