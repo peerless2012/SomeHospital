@@ -1,9 +1,26 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('D:/develop/debug.keystore')
+            storePassword 'android'
+        }
+    }
+
+
+    /*
+    so 文件要么拷贝在libs下，然后用下面的配置。要么放到main/jniLibs下
+    sourceSets{
+        main{
+            jniLibs.srcDirs = ["libs"]
+        }
+    }*/
+
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
-
     defaultConfig {
         applicationId "com.peerless2012.somehospital"
         minSdkVersion 14
@@ -27,8 +44,6 @@ dependencies {
     //compile 'com.zhy:okhttputils:2.4.1'
     // Because RxAndroid releases are few and far between, it is recommended you also
     // explicitly depend on RxJava's latest version for bug fixes and new features.
-    
-
     compile 'com.github.orhanobut:logger:1.12'
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'io.reactivex:rxjava:1.1.0'
@@ -36,4 +51,5 @@ dependencies {
     compile 'com.squareup.okio:okio:1.8.0'
     compile 'com.github.arimorty:floatingsearchview:1.1.2'
     compile 'com.android.support:support-v4:23.3.0'
+
 }

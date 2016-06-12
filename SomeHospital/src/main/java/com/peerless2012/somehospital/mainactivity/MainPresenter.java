@@ -44,7 +44,7 @@ public class MainPresenter implements MainContract.Presenter{
                     if (response != null && response.isSuccessful() && response.body() != null) {
                         String result = response.body().string();
                         hospitalInfos = new ArrayList<HospitalInfo>();
-                        for(int i = 0 ;i < 10;i ++){
+                        for(int i = 0 ;i < 100;i ++){
                             HospitalInfo hospitalInfo = new HospitalInfo();
                             hospitalInfo.setHospitalName("名字 "+i);
                             hospitalInfos.add(hospitalInfo);

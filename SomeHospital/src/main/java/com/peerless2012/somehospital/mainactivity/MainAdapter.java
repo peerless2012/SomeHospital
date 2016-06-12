@@ -1,6 +1,7 @@
 package com.peerless2012.somehospital.mainactivity;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
     private List<HospitalInfo> mHospitalInfos;
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater.from(parent.getContext());
         TextView textview = new TextView(parent.getContext());
         ViewHolder viewHolder = new ViewHolder(textview);
         return viewHolder;

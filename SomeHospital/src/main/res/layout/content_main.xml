@@ -10,7 +10,7 @@
     android:id="@+id/swipe_refresh"
     tools:context=".mainactivity.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
+    <com.peerless2012.somehospital.widget.QuickIndexRecycleView
         android:id="@+id/content_recycle_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
