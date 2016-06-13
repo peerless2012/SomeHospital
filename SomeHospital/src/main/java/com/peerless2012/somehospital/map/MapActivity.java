@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
-import android.widget.ZoomButtonsController;
-import android.widget.ZoomControls;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -23,16 +23,23 @@ import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.arlib.floatingsearchview.FloatingSearchView;
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.peerless2012.somehospital.R;
 import com.peerless2012.somehospital.base.BaseActivity;
+import com.peerless2012.somehospital.data.bean.HospitalInfo;
+import com.peerless2012.somehospital.data.bean.HospitalSearchSuggestion;
 import com.peerless2012.somehospital.widget.MapControl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 public class MapActivity extends BaseActivity
-        implements LocationSource,AMapLocationListener,AMap.OnMapLoadedListener{
+        implements LocationSource,AMapLocationListener,AMap.OnMapLoadedListener
+                    ,MapContract.MapView{
 
     private FloatingSearchView mFloatSearchView;
 
@@ -50,6 +57,8 @@ public class MapActivity extends BaseActivity
 
 
     private MapControl mMapControl;
+
+    private MapContract.MapPresenter mMapPresenter;
 
     @Override
     protected int getContentLayout() {
@@ -69,12 +78,38 @@ public class MapActivity extends BaseActivity
 
     @Override
     protected void initListener() {
-        mAMap.getMaxZoomLevel();
+        mFloatSearchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
+            @Override
+            public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
+
+            }
+
+            @Override
+            public void onSearchAction() {
+
+            }
+        });
+
+        mFloatSearchView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                return false;
+            }
+        });
+
+        mFloatSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+            @Override
+            public void onSearchTextChanged(String oldQuery, String newQuery) {
+                mMapPresenter.searchKeyWord(newQuery);
+            }
+        });
     }
 
     @Override
     protected void initData() {
-
+        mMapPresenter = new MapPresenter();
+        mMapPresenter.attach(this);
+        mMapPresenter.initData();
     }
 
     /**
@@ -133,6 +168,7 @@ public class MapActivity extends BaseActivity
 
     @Override
     protected void onDestroy() {
+        mMapPresenter.detach();
         mMapView.onDestroy();
         mMapControl.detachMap();
         mAMap.setMyLocationEnabled(false);
@@ -183,8 +219,7 @@ public class MapActivity extends BaseActivity
     @Override
     public void onLocationChanged(AMapLocation aMapLocation) {
         if (mListener != null && aMapLocation != null) {
-            if (aMapLocation != null
-                    && aMapLocation.getErrorCode() == 0) {
+            if (aMapLocation.getErrorCode() == 0) {
                 mListener.onLocationChanged(aMapLocation);// 显示系统小蓝点
 //                mAMap.setMyLocationEnabled(false);
                 mlocationClient.stopLocation();
@@ -199,6 +234,7 @@ public class MapActivity extends BaseActivity
     public void onMapLoaded() {
         mAMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
         mMapControl.attachMap(mAMap);
+        mMapPresenter.initData();
     }
 
     @Override
@@ -209,4 +245,30 @@ public class MapActivity extends BaseActivity
             super.onBackPressed();
         }
     }
+
+    @Override
+    public void onDataLoaded(List<HospitalInfo> hospitalInfos) {
+
+    }
+
+    @Override
+    public void onKeyWordSearched(List<HospitalInfo> hospitalInfos) {
+        if (hospitalInfos == null) {
+            mFloatSearchView.clearSuggestions();
+        }else {
+            HospitalSearchSuggestion suggestion;
+            List<HospitalSearchSuggestion> hospitalSearchSuggestions = new ArrayList<HospitalSearchSuggestion>();
+            for (int i = 0; i < hospitalInfos.size(); i++) {
+                suggestion = new HospitalSearchSuggestion(hospitalInfos.get(i));
+                hospitalSearchSuggestions.add(suggestion);
+            }
+            mFloatSearchView.swapSuggestions(hospitalSearchSuggestions);
+        }
+    }
+
+    @Override
+    public void setPresenter(MapContract.MapPresenter presenter) {
+
+    }
+
 }

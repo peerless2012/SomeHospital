@@ -1,7 +1,8 @@
 package com.peerless2012.somehospital.mainactivity;
 
 import android.os.SystemClock;
-import com.peerless2012.somehospital.model.HospitalInfo;
+
+import com.peerless2012.somehospital.data.bean.HospitalInfo;
 import com.peerless2012.somehospital.net.OkHttpUtils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,7 +47,6 @@ public class MainPresenter implements MainContract.Presenter{
                         hospitalInfos = new ArrayList<HospitalInfo>();
                         for(int i = 0 ;i < 100;i ++){
                             HospitalInfo hospitalInfo = new HospitalInfo();
-                            hospitalInfo.setHospitalName("名字 "+i);
                             hospitalInfos.add(hospitalInfo);
                         }
 
@@ -80,7 +80,6 @@ public class MainPresenter implements MainContract.Presenter{
 
     @Override
     public void search(String key) {
-
     }
 
     @Override
@@ -89,7 +88,12 @@ public class MainPresenter implements MainContract.Presenter{
     }
 
     @Override
-    public void start() {
+    public void attach(MainContract.View view) {
+
+    }
+
+    @Override
+    public void detach() {
 
     }
 }

@@ -2,8 +2,9 @@ package com.peerless2012.somehospital.data.source.local;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.peerless2012.somehospital.data.bean.HospitalInfo;
 import com.peerless2012.somehospital.data.source.HospitalDataSource;
-import com.peerless2012.somehospital.model.HospitalInfo;
 
 import java.util.List;
 
@@ -19,15 +20,5 @@ public class HospitalLocalDataSource extends BaseLocalDataSource implements Hosp
 
     public HospitalLocalDataSource(Context context, int version) {
         super(context, version);
-    }
-
-    @Override
-    public void insertOrUpdateHospitals(List<HospitalInfo> hospitalInfos) {
-        SQLiteDatabase database = getWritableDatabase();
-    }
-
-    @Override
-    public void queryHospitalsByCity(String cityName, LoadHospitalCallBack loadHospitalCallBack) {
-
     }
 }

@@ -16,8 +16,9 @@
 
 package com.peerless2012.somehospital;
 
-public interface BasePresenter {
+public interface BasePresenter<V> {
 
-    void start();
+    void attach(V v);
 
+    void detach();
 }

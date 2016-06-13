@@ -2,7 +2,8 @@ package com.peerless2012.somehospital.mainactivity;
 
 import com.peerless2012.somehospital.BasePresenter;
 import com.peerless2012.somehospital.BaseView;
-import com.peerless2012.somehospital.model.HospitalInfo;
+import com.peerless2012.somehospital.data.bean.HospitalInfo;
+
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public interface MainContract {
         void onDataLoaded(List<HospitalInfo> hospitalInfos);
     }
 
-    interface Presenter extends BasePresenter{
+    interface Presenter extends BasePresenter<View>{
         void startLoading(String url);
         void refresh();
         void search(String key);

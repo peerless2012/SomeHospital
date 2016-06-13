@@ -1,7 +1,5 @@
 package com.peerless2012.somehospital.mainactivity;
 
-import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,8 +17,9 @@ import android.view.MenuItem;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.peerless2012.somehospital.R;
+import com.peerless2012.somehospital.data.bean.HospitalInfo;
 import com.peerless2012.somehospital.map.MapActivity;
-import com.peerless2012.somehospital.model.HospitalInfo;
+
 import java.util.List;
 
 /**
@@ -149,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDataLoaded(List<HospitalInfo> hospitalInfos) {
-        mMainAdapter.changeData(hospitalInfos);
-        mSwipeRefreshLayout.setRefreshing(false);
+
     }
 }

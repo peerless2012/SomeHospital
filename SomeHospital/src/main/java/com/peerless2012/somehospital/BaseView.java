@@ -16,8 +16,7 @@
 
 package com.peerless2012.somehospital;
 
-public interface BaseView<T> {
+public interface BaseView<P> {
 
-    void setPresenter(T presenter);
-
+    void setPresenter(P presenter);
 }

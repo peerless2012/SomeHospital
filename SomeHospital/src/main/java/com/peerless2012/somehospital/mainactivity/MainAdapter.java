@@ -5,7 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.peerless2012.somehospital.model.HospitalInfo;
+
+import com.peerless2012.somehospital.data.bean.HospitalInfo;
+
 import java.util.List;
 
 /**
@@ -43,7 +45,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
         }
 
         public void bindData(HospitalInfo hospitalInfo){
-            hospitalName.setText(hospitalInfo.getHospitalName());
         }
     }
 
