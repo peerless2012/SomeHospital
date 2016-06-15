@@ -1,5 +1,10 @@
 package com.peerless2012.somehospital.data.source.remote;
 
+import com.peerless2012.netlibrary.OkHttpUtils;
+import com.peerless2012.netlibrary.callback.OkCallBack;
+import com.peerless2012.netlibrary.response.AbsResponse;
+import com.peerless2012.somehospital.data.RequestAndResponsePara.CheckDbVersionRequest;
+import com.peerless2012.somehospital.data.bean.VersionInfo;
 import com.peerless2012.somehospital.data.source.HospitalRemoteDataSource;
 
 /**
@@ -10,6 +15,22 @@ import com.peerless2012.somehospital.data.source.HospitalRemoteDataSource;
  * @Description
  */
 public class HospitalRemoteDataSourceIml implements HospitalRemoteDataSource{
+
+    @Override
+    public void checkDbVersion() {
+        CheckDbVersionRequest request = new CheckDbVersionRequest();
+        OkHttpUtils.getInstance().asyncExcute(request, new OkCallBack<VersionInfo>() {
+            @Override
+            public void onFail() {
+
+            }
+
+            @Override
+            public void onScuss(AbsResponse<VersionInfo> response) {
+//                response.getData().
+            }
+        });
+    }
 
     @Override
     public void loadDataVersion() {

@@ -9,6 +9,8 @@ package com.peerless2012.somehospital.data.source;
  */
 public interface HospitalRemoteDataSource {
 
+    void checkDbVersion();
+
     void loadDataVersion();
 
     void loadHospitals();
