@@ -32,7 +32,7 @@ public class SplashActivity extends BaseActivity implements SplashContract.Splas
 
     @Override
     protected void initData() {
-        mSplashPresenter = new SplashPresenter();
+        mSplashPresenter = new SplashPresenter(null);
         mSplashPresenter.attach(this);
         mSplashPresenter.checkDbVersion();
     }

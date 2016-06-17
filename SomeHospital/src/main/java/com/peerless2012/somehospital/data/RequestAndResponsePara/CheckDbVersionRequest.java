@@ -1,5 +1,5 @@
 package com.peerless2012.somehospital.data.RequestAndResponsePara;
-
+import com.peerless2012.netlibrary.common.Method;
 import com.peerless2012.netlibrary.request.JsonRequest;
 import com.peerless2012.somehospital.data.bean.VersionInfo;
 
@@ -13,11 +13,16 @@ import com.peerless2012.somehospital.data.bean.VersionInfo;
 public class CheckDbVersionRequest extends JsonRequest<VersionInfo>{
     @Override
     protected Class<VersionInfo> getResultClass() {
-        return null;
+        return VersionInfo.class;
+    }
+
+    @Override
+    public String getMethod() {
+        return Method.GET;
     }
 
     @Override
     public String getUrl() {
-        return null;
+        return "https://raw.githubusercontent.com/peerless2012/SomeHospital/master/data/DbVersion.json";
     }
 }

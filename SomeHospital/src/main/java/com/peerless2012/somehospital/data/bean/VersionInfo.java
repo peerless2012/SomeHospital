@@ -1,5 +1,8 @@
 package com.peerless2012.somehospital.data.bean;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 /**
  * @author peerless2012
  * @Email peerless2012@126.com
@@ -8,4 +11,15 @@ package com.peerless2012.somehospital.data.bean;
  * @Description :
  */
 public class VersionInfo {
+    @SerializedName("dbversion")
+    @Expose
+    private int dbversion;
+
+    public int getDbversion() {
+        return dbversion;
+    }
+
+    public void setDbversion(int dbversion) {
+        this.dbversion = dbversion;
+    }
 }

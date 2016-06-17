@@ -45,6 +45,11 @@ public class HospitalRepository implements HospitalDataSource
     }
 
     @Override
+    public void checkDbVersion() {
+        mRemoteDataSource.checkDbVersion();
+    }
+
+    @Override
     public void loadDataVersion() {
 
     }

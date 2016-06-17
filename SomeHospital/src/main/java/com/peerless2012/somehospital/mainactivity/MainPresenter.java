@@ -2,8 +2,9 @@ package com.peerless2012.somehospital.mainactivity;
 
 import android.os.SystemClock;
 
+import com.peerless2012.netlibrary.OkHttpUtils;
 import com.peerless2012.somehospital.data.bean.HospitalInfo;
-import com.peerless2012.somehospital.net.OkHttpUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

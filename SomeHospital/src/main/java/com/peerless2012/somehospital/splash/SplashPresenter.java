@@ -1,7 +1,11 @@
 package com.peerless2012.somehospital.splash;
 
-import android.os.Handler;
-import android.os.Message;
+import com.peerless2012.netlibrary.HttpUtils;
+import com.peerless2012.netlibrary.callback.OkCallBack;
+import com.peerless2012.netlibrary.response.AbsResponse;
+import com.peerless2012.somehospital.data.RequestAndResponsePara.CheckDbVersionRequest;
+import com.peerless2012.somehospital.data.bean.VersionInfo;
+import com.peerless2012.somehospital.data.source.HospitalRepository;
 
 /**
  * @author peerless2012
@@ -12,19 +16,29 @@ import android.os.Message;
  */
 public class SplashPresenter implements SplashContract.SplashPresenter{
 
-    private SplashContract.SplashView msSplashView;
+    private HospitalRepository mHospitalRepository;
 
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            msSplashView.onCheckResult(true);
-        }
-    };
+    public SplashPresenter(HospitalRepository mHospitalRepository) {
+        this.mHospitalRepository = mHospitalRepository;
+    }
+
+    private SplashContract.SplashView msSplashView;
 
     @Override
     public void checkDbVersion() {
-        mHandler.sendEmptyMessageDelayed(0,3000);
+//        mHospitalRepository.checkDbVersion();
+        CheckDbVersionRequest request = new CheckDbVersionRequest();
+        HttpUtils.getInstance().asyncExcute(request, new OkCallBack<VersionInfo>() {
+            @Override
+            public void onFail(int errorCode, String errorMsg) {
+                msSplashView.onCheckResult(false);
+            }
+
+            @Override
+            public void onScuss(AbsResponse<VersionInfo> response) {
+                msSplashView.onCheckResult(true);
+            }
+        });
     }
 
     @Override
