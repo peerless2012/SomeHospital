@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="base_url">https://raw.githubusercontent.com/peerless2012/SomeHospital/master/data/</string>
+</resources>

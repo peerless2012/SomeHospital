@@ -14,6 +14,7 @@ public class HospitalInfo {
     private String[] websets;
     private String address;
     private String[] proofs;
+    private Geo geo;
     public String getName() {
         return name;
     }
@@ -23,18 +24,6 @@ public class HospitalInfo {
 
     public String[] getPhones() {
         return phones;
-    }
-
-    public void addPhone(String phone){
-        if (phones == null) {
-            phones = new String[5];
-        }
-        for (int i = 0; i < phones.length; i++) {
-            if (phones[i] == null) {
-                phones[i] = phone;
-                break;
-            }
-        }
     }
 
     public void setPhones(String[] phones) {
@@ -48,35 +37,11 @@ public class HospitalInfo {
         this.websets = websets;
     }
 
-    public void addWebset(String webset){
-        if (websets == null) {
-            websets = new String[5];
-        }
-        for (int i = 0; i < websets.length; i++) {
-            if (websets[i] == null) {
-                websets[i] = webset;
-                break;
-            }
-        }
-    }
-
     public String getAddress() {
         return address;
     }
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public void addProof(String proof){
-        if (proofs == null) {
-            proofs = new String[5];
-        }
-        for (int i = 0; i < proofs.length; i++) {
-            if (proofs[i] == null) {
-                proofs[i] = proof;
-                break;
-            }
-        }
     }
 
     public String[] getProofs() {
@@ -85,6 +50,15 @@ public class HospitalInfo {
     public void setProofs(String[] proofs) {
         this.proofs = proofs;
     }
+
+    public Geo getGeo() {
+        return geo;
+    }
+
+    public void setGeo(Geo geo) {
+        this.geo = geo;
+    }
+
     @Override
     public String toString() {
         return "HospitalInfo [name=" + name + ", phones="

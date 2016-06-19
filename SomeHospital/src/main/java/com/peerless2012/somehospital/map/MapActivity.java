@@ -1,5 +1,6 @@
 package com.peerless2012.somehospital.map;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -28,6 +29,7 @@ import com.peerless2012.somehospital.R;
 import com.peerless2012.somehospital.base.BaseActivity;
 import com.peerless2012.somehospital.data.bean.HospitalInfo;
 import com.peerless2012.somehospital.data.bean.HospitalSearchSuggestion;
+import com.peerless2012.somehospital.utils.GeoGenerateUtils;
 import com.peerless2012.somehospital.widget.MapControl;
 
 import java.util.ArrayList;
@@ -103,6 +105,13 @@ public class MapActivity extends BaseActivity
                 mMapPresenter.searchKeyWord(newQuery);
             }
         });
+
+        mFloatSearchView.setOnMenuItemClickListener(new FloatingSearchView.OnMenuItemClickListener() {
+            @Override
+            public void onActionMenuItemSelected(MenuItem item) {
+                generateGeo();
+            }
+        });
     }
 
     @Override
@@ -145,9 +154,27 @@ public class MapActivity extends BaseActivity
             // This ID represents the Home or Up button.
             NavUtils.navigateUpFromSameTask(this);
             return true;
+        }else if (id == R.id.action_generate_data){
+            generateGeo();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void generateGeo() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+//        progressDialog.setMax();
+        //HospitalsInfo.json
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                GeoGenerateUtils utils = new GeoGenerateUtils();
+                utils.generateGeo(MapActivity.this);
+            }
+        }.start();
+    }
+
 
     @Override
     protected void onResume() {

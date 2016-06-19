@@ -1,8 +1,10 @@
 package com.peerless2012.somehospital.splash;
 
+import android.animation.Animator;
 import com.peerless2012.somehospital.R;
 import com.peerless2012.somehospital.base.BaseActivity;
 import com.peerless2012.somehospital.map.MapActivity;
+import com.peerless2012.somehospital.widget.HeartView;
 
 /**
  * @author peerless2012
@@ -11,9 +13,12 @@ import com.peerless2012.somehospital.map.MapActivity;
  * @Version V1.0
  * @Description :
  */
-public class SplashActivity extends BaseActivity implements SplashContract.SplashView{
+public class SplashActivity extends BaseActivity
+        implements SplashContract.SplashView,Animator.AnimatorListener{
 
     private SplashPresenter mSplashPresenter;
+
+    private HeartView mHeartView;
 
     @Override
     protected int getContentLayout() {
@@ -22,12 +27,12 @@ public class SplashActivity extends BaseActivity implements SplashContract.Splas
 
     @Override
     protected void initView() {
-
+        mHeartView = getView(R.id.heart_view);
     }
 
     @Override
     protected void initListener() {
-
+        mHeartView.setOnAnimListener(this);
     }
 
     @Override
@@ -45,12 +50,31 @@ public class SplashActivity extends BaseActivity implements SplashContract.Splas
 
     @Override
     public void onCheckResult(boolean success) {
+    }
+
+    @Override
+    public void setPresenter(SplashContract.SplashPresenter presenter) {
+
+    }
+
+    @Override
+    public void onAnimationStart(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationEnd(Animator animation) {
         MapActivity.launch(this);
         finish();
     }
 
     @Override
-    public void setPresenter(SplashContract.SplashPresenter presenter) {
+    public void onAnimationCancel(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationRepeat(Animator animation) {
 
     }
 }
