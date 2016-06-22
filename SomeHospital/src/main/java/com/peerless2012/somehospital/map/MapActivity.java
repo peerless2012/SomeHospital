@@ -39,7 +39,7 @@ import java.util.List;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class MapActivity extends BaseActivity
+public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.MapPresenter>
         implements LocationSource,AMapLocationListener,AMap.OnMapLoadedListener
                     ,MapContract.MapView{
 
@@ -61,6 +61,16 @@ public class MapActivity extends BaseActivity
     private MapControl mMapControl;
 
     private MapContract.MapPresenter mMapPresenter;
+
+    @Override
+    public MapContract.MapView getPresenterView() {
+        return this;
+    }
+
+    @Override
+    public MapContract.MapPresenter getPresenter() {
+        return null;
+    }
 
     @Override
     protected int getContentLayout() {

@@ -21,4 +21,5 @@ public interface BasePresenter<V> {
     void attach(V v);
 
     void detach();
+
 }

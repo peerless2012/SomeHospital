@@ -1,11 +1,10 @@
 package com.peerless2012.somehospital.splash;
 
-import com.peerless2012.netlibrary.HttpUtils;
-import com.peerless2012.netlibrary.callback.OkCallBack;
-import com.peerless2012.netlibrary.response.AbsResponse;
-import com.peerless2012.somehospital.data.RequestAndResponsePara.CheckDbVersionRequest;
+import com.peerless2012.somehospital.data.bean.CityInfo;
 import com.peerless2012.somehospital.data.bean.VersionInfo;
+import com.peerless2012.somehospital.data.source.HospitalDataSource;
 import com.peerless2012.somehospital.data.source.HospitalRepository;
+import java.util.List;
 
 /**
  * @author peerless2012
@@ -25,18 +24,31 @@ public class SplashPresenter implements SplashContract.SplashPresenter{
     private SplashContract.SplashView msSplashView;
 
     @Override
-    public void checkDbVersion() {
-//        mHospitalRepository.checkDbVersion();
-        CheckDbVersionRequest request = new CheckDbVersionRequest();
-        HttpUtils.getInstance().asyncExcute(request, new OkCallBack<VersionInfo>() {
+    public void checkDbVersion(final int localVersion) {
+        mHospitalRepository.checkDbVersion(new HospitalDataSource.CheckDbCallBack() {
             @Override
-            public void onFail(int errorCode, String errorMsg) {
-                msSplashView.onCheckResult(false);
+            public void onCheckSucess(final VersionInfo versionInfo) {
+                if (versionInfo.getDbversion() > localVersion){
+                    mHospitalRepository.loadHospitalsWithGeo(new HospitalDataSource.LoadHospitalsCallBack() {
+                        @Override
+                        public void onLoadSucess(List<CityInfo> cityInfos) {
+                            msSplashView.onDbUpdated(versionInfo.getDbversion());
+                        }
+
+                        @Override
+                        public void onFaild() {
+                            msSplashView.onCheckFaild();
+                        }
+                    });
+                }else {
+                    // 已经是最新，无需更新
+                    msSplashView.onDbNotNeedUpdate();
+                }
             }
 
             @Override
-            public void onScuss(AbsResponse<VersionInfo> response) {
-                msSplashView.onCheckResult(true);
+            public void onFaild() {
+                msSplashView.onCheckFaild();
             }
         });
     }

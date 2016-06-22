@@ -2,14 +2,15 @@ package com.peerless2012.somehospital.base;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import com.peerless2012.somehospital.BasePresenter;
 import com.peerless2012.somehospital.R;
-
 import java.io.File;
 
 /**
@@ -19,19 +20,25 @@ import java.io.File;
 * @Version V1.0
 * @Description: Activity的基类
 */
- abstract public class BaseActivity extends AppCompatActivity {
+ abstract public class BaseActivity<V,P extends BasePresenter<V>> extends AppCompatActivity{
     protected String cacheDir;
     protected ViewGroup.LayoutParams contentViewParams;
     protected Toolbar toolbar;
-
+    protected P mPresenter;
     @Override
     final protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mPresenter = getPresenter();
+        if (mPresenter != null) mPresenter.attach(getPresenterView());
         initActivity();
         initView();
         initListener();
         initData();
     }
+
+    public abstract V getPresenterView();
+
+    public abstract P getPresenter();
 
     private void initActivity() {
         int contentLayoutRes = getContentLayout();
@@ -102,6 +109,13 @@ import java.io.File;
         if (actionBar != null) {
             actionBar.setTitle(title);
         }
+    }
+
+    @CallSuper
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mPresenter != null) mPresenter.detach();
     }
 
     @SuppressWarnings("unchecked")

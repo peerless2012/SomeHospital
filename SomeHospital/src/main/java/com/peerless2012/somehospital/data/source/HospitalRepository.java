@@ -1,7 +1,10 @@
 package com.peerless2012.somehospital.data.source;
 
-import com.peerless2012.somehospital.data.bean.HospitalInfo;
-
+import android.content.Context;
+import com.peerless2012.netlibrary.callback.OkInnerWork;
+import com.peerless2012.netlibrary.request.AbsRequest;
+import com.peerless2012.netlibrary.response.AbsResponse;
+import com.peerless2012.somehospital.data.bean.CityInfo;
 import java.util.List;
 
 /**
@@ -11,28 +14,31 @@ import java.util.List;
  * @Version V1.0
  * @Description 获取医院列表的类，封装了远程、本地、内存三重缓存
  */
-public class HospitalRepository implements HospitalDataSource
-                                        ,HospitalRemoteDataSource,HospitalLocalDataSource{
+public class HospitalRepository implements HospitalDataSource{
 
     private static volatile HospitalRepository sInst = null;  // <<< 这里添加了 volatile
+
     boolean mCacheIsDirty = false;
 
     private HospitalLocalDataSource mLocalDataSource;
 
     private HospitalRemoteDataSource mRemoteDataSource;
 
-    private HospitalRepository(HospitalLocalDataSource localDataSource,HospitalRemoteDataSource remoteDataSource) {
+    private Context mContext;
+
+    private HospitalRepository(Context context,HospitalLocalDataSource localDataSource, HospitalRemoteDataSource remoteDataSource) {
         this.mLocalDataSource = localDataSource;
         this.mRemoteDataSource = remoteDataSource;
+        this.mContext = context.getApplicationContext();
     }
 
-    public static HospitalRepository getInstance(HospitalLocalDataSource localDataSource,HospitalRemoteDataSource remoteDataSource) {
+    public static HospitalRepository getInstance(Context context,HospitalLocalDataSource localDataSource,HospitalRemoteDataSource remoteDataSource) {
         HospitalRepository inst = sInst;  // <<< 在这里创建临时变量
         if (inst == null) {
             synchronized (HospitalRepository.class) {
                 inst = sInst;
                 if (inst == null) {
-                    inst = new HospitalRepository(localDataSource,remoteDataSource);
+                    inst = new HospitalRepository(context,localDataSource,remoteDataSource);
                     sInst = inst;
                 }
             }
@@ -44,23 +50,42 @@ public class HospitalRepository implements HospitalDataSource
         sInst = null;
     }
 
+
     @Override
-    public void checkDbVersion() {
-        mRemoteDataSource.checkDbVersion();
+    public void checkDbVersion(CheckDbCallBack callBack) {
+        mRemoteDataSource.checkDbVersion(callBack);
     }
 
     @Override
-    public void loadDataVersion() {
+    public void loadHospitalsWithGeo(final LoadHospitalsCallBack callBack) {
+        mLocalDataSource.getHospitals(new LoadHospitalsCallBack() {
+            @Override
+            public void onLoadSucess(List<CityInfo> cityInfos) {
+                if (cityInfos == null){
+                    mRemoteDataSource.loadHospitalsWithGeo(callBack, new OkInnerWork<List<CityInfo>>() {
+                        @Override
+                        public void preDo(AbsRequest<List<CityInfo>> request) {
 
-    }
+                        }
 
-    @Override
-    public void loadHospitals() {
+                        @Override
+                        public void afterDo(AbsResponse<List<CityInfo>> response) {
+                            // 存储数据
+                            if (response != null && response.isSuccess()){
+                                mLocalDataSource.saveHospitals(response.getData());
+                            }
+                        }
+                    });
+                }else {
+                    callBack.onLoadSucess(cityInfos);
+                }
+            }
 
-    }
-
-    @Override
-    public void loadHospitalsWithGeo() {
+            @Override
+            public void onFaild() {
+                callBack.onFaild();
+            }
+        });
 
     }
 }

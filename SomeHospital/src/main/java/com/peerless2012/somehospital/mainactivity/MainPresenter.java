@@ -3,6 +3,7 @@ package com.peerless2012.somehospital.mainactivity;
 import android.os.SystemClock;
 
 import com.peerless2012.netlibrary.OkHttpUtils;
+import com.peerless2012.somehospital.base.BaseActivity;
 import com.peerless2012.somehospital.data.bean.HospitalInfo;
 
 import java.io.IOException;

@@ -1,5 +1,11 @@
 package com.peerless2012.somehospital.data.source;
 
+
+import com.peerless2012.netlibrary.callback.OkInnerWork;
+import com.peerless2012.somehospital.data.bean.CityInfo;
+
+import java.util.List;
+
 /**
  * @author peerless2012
  * @Email peerless2012@126.com
@@ -9,11 +15,7 @@ package com.peerless2012.somehospital.data.source;
  */
 public interface HospitalRemoteDataSource {
 
-    void checkDbVersion();
+    void checkDbVersion(HospitalDataSource.CheckDbCallBack callBack);
 
-    void loadDataVersion();
-
-    void loadHospitals();
-
-    void loadHospitalsWithGeo();
+    void loadHospitalsWithGeo(HospitalDataSource.LoadHospitalsCallBack callBack, OkInnerWork<List<CityInfo>> innerWork);
 }

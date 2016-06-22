@@ -1,8 +1,13 @@
 package com.peerless2012.somehospital.splash;
 
 import android.animation.Animator;
+import android.content.SharedPreferences;
+
 import com.peerless2012.somehospital.R;
 import com.peerless2012.somehospital.base.BaseActivity;
+import com.peerless2012.somehospital.data.source.HospitalRepository;
+import com.peerless2012.somehospital.data.source.local.HospitalLocalDataSourceImpl;
+import com.peerless2012.somehospital.data.source.remote.HospitalRemoteDataSourceIml;
 import com.peerless2012.somehospital.map.MapActivity;
 import com.peerless2012.somehospital.widget.HeartView;
 
@@ -13,12 +18,30 @@ import com.peerless2012.somehospital.widget.HeartView;
  * @Version V1.0
  * @Description :
  */
-public class SplashActivity extends BaseActivity
+public class SplashActivity extends BaseActivity<SplashContract.SplashView,SplashPresenter>
         implements SplashContract.SplashView,Animator.AnimatorListener{
 
-    private SplashPresenter mSplashPresenter;
+    private final static String DB_VERSION = "DbVersion";
+
+    private boolean isAnimEnded = false;
+
+    private boolean isDataInited = false;
 
     private HeartView mHeartView;
+
+    private SharedPreferences mSharedPreferences;
+
+    @Override
+    public SplashContract.SplashView getPresenterView() {
+        return this;
+    }
+
+    @Override
+    public SplashPresenter getPresenter() {
+        return new SplashPresenter(HospitalRepository.getInstance(this
+                , HospitalLocalDataSourceImpl.getInstance(this)
+                , HospitalRemoteDataSourceIml.getInstance(this)));
+    }
 
     @Override
     protected int getContentLayout() {
@@ -32,25 +55,16 @@ public class SplashActivity extends BaseActivity
 
     @Override
     protected void initListener() {
-        mHeartView.setOnAnimListener(this);
+        mHeartView.setAnimListener(this);
     }
 
     @Override
     protected void initData() {
-        mSplashPresenter = new SplashPresenter(null);
-        mSplashPresenter.attach(this);
-        mSplashPresenter.checkDbVersion();
+        mSharedPreferences = getSharedPreferences("config",MODE_PRIVATE);
+        int dbVersion = mSharedPreferences.getInt(DB_VERSION, 0);
+        mPresenter.checkDbVersion(dbVersion);
     }
 
-    @Override
-    protected void onDestroy() {
-        mSplashPresenter.detach();
-        super.onDestroy();
-    }
-
-    @Override
-    public void onCheckResult(boolean success) {
-    }
 
     @Override
     public void setPresenter(SplashContract.SplashPresenter presenter) {
@@ -64,8 +78,8 @@ public class SplashActivity extends BaseActivity
 
     @Override
     public void onAnimationEnd(Animator animation) {
-        MapActivity.launch(this);
-        finish();
+        isAnimEnded = true;
+        jump();
     }
 
     @Override
@@ -76,5 +90,32 @@ public class SplashActivity extends BaseActivity
     @Override
     public void onAnimationRepeat(Animator animation) {
 
+    }
+
+    private void jump(){
+        if (isAnimEnded && isDataInited){
+            MapActivity.launch(this);
+            finish();
+        }
+    }
+
+    @Override
+    public void onCheckFaild() {
+        isDataInited = true;
+        jump();
+    }
+
+    @Override
+    public void onDbNotNeedUpdate() {
+        isDataInited = true;
+        jump();
+    }
+
+    @Override
+    public void onDbUpdated(int newVersion) {
+        mSharedPreferences.edit().putInt(DB_VERSION,newVersion).apply();
+        isDataInited = true;
+        jump();
+        // TODO 存储最新版本号
     }
 }

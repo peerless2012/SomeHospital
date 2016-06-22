@@ -1,5 +1,8 @@
 package com.peerless2012.somehospital.data.source;
 
+import com.peerless2012.somehospital.data.bean.CityInfo;
+import java.util.List;
+
 /**
  * @author peerless2012
  * @Email peerless2012@126.com
@@ -9,8 +12,8 @@ package com.peerless2012.somehospital.data.source;
  */
 public interface HospitalLocalDataSource {
 
+    void saveHospitals(List<CityInfo> cityInfos);
 
-
-
+    void getHospitals(HospitalDataSource.LoadHospitalsCallBack callBack);
 
 }
