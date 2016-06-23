@@ -12,6 +12,15 @@
         android:layout_height="match_parent">
     </com.amap.api.maps.MapView>
 
+    <com.peerless2012.somehospital.widget.MapControl
+        android:fitsSystemWindows="true"
+        android:id="@+id/map_control"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="right|bottom"/>
+
     <com.arlib.floatingsearchview.FloatingSearchView
         android:fitsSystemWindows="true"
         android:id="@+id/floating_search_view"
@@ -26,13 +35,6 @@
         app:floatingSearch_searchHint="Search..."
         app:floatingSearch_showSearchKey="false"/>
 
-    <com.peerless2012.somehospital.widget.MapControl
-        android:fitsSystemWindows="true"
-        android:id="@+id/map_control"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="right|bottom"/>
+
 
 </FrameLayout>

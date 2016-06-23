@@ -24,8 +24,8 @@ public class LoadHospitalsRequest extends JsonRequest<List<CityInfo>>{
 
     @Override
     public String getUrl() {
-//        return "https://raw.githubusercontent.com/peerless2012/SomeHospital/master/data/HospitalsGeoInfo.json";
-        return "http://192.168.31.201:8080/data/HospitalsGeoInfo.json";
+        return "https://raw.githubusercontent.com/peerless2012/SomeHospital/master/data/HospitalsGeoInfo.json";
+//        return "http://192.168.31.201:8080/data/HospitalsGeoInfo.json";
     }
 
 

@@ -5,7 +5,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -71,6 +75,8 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     private MapControl mMapControl;
 
     private HospitalInfoWindowAdapter mInfoWindowAdapter;
+
+    private LatLng mLatLng;
 
     @Override
     public MapContract.MapView getPresenterView() {
@@ -148,7 +154,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         // 自定义系统定位小蓝点
         MyLocationStyle myLocationStyle = new MyLocationStyle();
         myLocationStyle.myLocationIcon(BitmapDescriptorFactory
-                .fromResource(R.drawable.arrow));// 设置小蓝点的图标
+                .fromResource(R.drawable.person));// 设置小蓝点的图标
         myLocationStyle.strokeColor(Color.BLACK);// 设置圆形的边框颜色
         myLocationStyle.radiusFillColor(Color.argb(100, 0, 0, 180));// 设置圆形的填充颜色
         // myLocationStyle.anchor(int,int)//设置小蓝点的锚点
@@ -269,6 +275,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
                 mPresenter.initData(aMapLocation.getCity());
                 mListener.onLocationChanged(aMapLocation);// 显示系统小蓝点
 //                mAMap.setMyLocationEnabled(false);
+                mLatLng = new LatLng(aMapLocation.getLatitude(),aMapLocation.getLongitude());
                 mlocationClient.stopLocation();
             } else {
                 String errText = "定位失败," + aMapLocation.getErrorCode()+ ": " + aMapLocation.getErrorInfo();
@@ -295,12 +302,15 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     @Override
     public void onDataLoaded(List<HospitalInfo> hospitalInfos) {
         mAMap.clear();
+
+        initCurrentLocation();
+
         if (hospitalInfos != null){
             int size = hospitalInfos.size();
             for (int i = 0; i < size; i++) {
                 HospitalInfo hospitalInfo = hospitalInfos.get(i);
-                Bitmap hospitalBitmap = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
-                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hospitalBitmap);
+//                Bitmap hospitalBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.hospital);
+                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.hospital);
                 MarkerOptions markerOptions = new MarkerOptions();
                 Geo geo = hospitalInfo.getGeo();
                 markerOptions.position(new LatLng(geo.getLatitude(),geo.getLongitude()));
@@ -313,6 +323,15 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
             // 数据为空
         }
 
+    }
+
+    private void initCurrentLocation(){
+        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.person);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(mLatLng);
+        markerOptions.icon(bitmapDescriptor);
+        Marker marker = mAMap.addMarker(markerOptions);
+        marker.setObject(null);
     }
 
     @Override
@@ -338,9 +357,12 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     @Override
     public boolean onMarkerClick(Marker marker) {
         HospitalInfo hospitalInfo = (HospitalInfo) marker.getObject();
-        Log.i(TAG, "onMarkerClick: "+ hospitalInfo.toString());
-        marker.showInfoWindow();
-        return false;
+        if (hospitalInfo == null){
+            return true;
+        }else {
+            marker.showInfoWindow();
+            return false;
+        }
     }
 
 
