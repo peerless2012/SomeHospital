@@ -112,7 +112,7 @@ public class HospitalRepository implements HospitalDataSource{
                     int size = cityInfos.size();
                     for (int i = 0; i < size; i++) {
                         CityInfo cityInfo = cityInfos.get(i);
-                        if (cityName.equals(cityInfo.getCityName())){
+                        if (cityName.contains(cityInfo.getCityName())){
                             List<HospitalInfo> hospitalInfos = cityInfo.getHospitalInfos();
                             callBack.onSuccess(hospitalInfos);
                             return;
