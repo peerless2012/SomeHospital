@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface HospitalRemoteDataSource {
 
-    void checkDbVersion(HospitalDataSource.CheckDbCallBack callBack);
+    void checkDbVersion(HospitalDataSource.SimpleCallBack callBack);
 
-    void loadHospitalsWithGeo(HospitalDataSource.LoadHospitalsCallBack callBack, OkInnerWork<List<CityInfo>> innerWork);
+    void loadHospitalsWithGeo(HospitalDataSource.SimpleCallBack callBack, OkInnerWork<List<CityInfo>> innerWork);
 }

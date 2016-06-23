@@ -21,15 +21,11 @@ import com.peerless2012.somehospital.widget.HeartView;
 public class SplashActivity extends BaseActivity<SplashContract.SplashView,SplashPresenter>
         implements SplashContract.SplashView,Animator.AnimatorListener{
 
-    private final static String DB_VERSION = "DbVersion";
-
     private boolean isAnimEnded = false;
 
     private boolean isDataInited = false;
 
     private HeartView mHeartView;
-
-    private SharedPreferences mSharedPreferences;
 
     @Override
     public SplashContract.SplashView getPresenterView() {
@@ -38,9 +34,7 @@ public class SplashActivity extends BaseActivity<SplashContract.SplashView,Splas
 
     @Override
     public SplashPresenter getPresenter() {
-        return new SplashPresenter(HospitalRepository.getInstance(this
-                , HospitalLocalDataSourceImpl.getInstance(this)
-                , HospitalRemoteDataSourceIml.getInstance(this)));
+        return new SplashPresenter(this);
     }
 
     @Override
@@ -60,9 +54,7 @@ public class SplashActivity extends BaseActivity<SplashContract.SplashView,Splas
 
     @Override
     protected void initData() {
-        mSharedPreferences = getSharedPreferences("config",MODE_PRIVATE);
-        int dbVersion = mSharedPreferences.getInt(DB_VERSION, 0);
-        mPresenter.checkDbVersion(dbVersion);
+        mPresenter.checkDbVersion();
     }
 
 
@@ -112,10 +104,8 @@ public class SplashActivity extends BaseActivity<SplashContract.SplashView,Splas
     }
 
     @Override
-    public void onDbUpdated(int newVersion) {
-        mSharedPreferences.edit().putInt(DB_VERSION,newVersion).apply();
+    public void onDbUpdated() {
         isDataInited = true;
         jump();
-        // TODO 存储最新版本号
     }
 }

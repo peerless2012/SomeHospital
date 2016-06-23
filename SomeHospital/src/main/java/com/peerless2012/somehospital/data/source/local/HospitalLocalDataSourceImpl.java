@@ -7,8 +7,6 @@ import com.google.gson.reflect.TypeToken;
 import com.peerless2012.somehospital.data.bean.CityInfo;
 import com.peerless2012.somehospital.data.source.HospitalDataSource;
 import com.peerless2012.somehospital.data.source.HospitalLocalDataSource;
-import com.peerless2012.somehospital.data.source.HospitalRemoteDataSource;
-import com.peerless2012.somehospital.data.source.HospitalRepository;
 import com.peerless2012.somehospital.data.thread.ExecutorCallBack;
 import com.peerless2012.somehospital.data.thread.ExecutorRunnable;
 import com.peerless2012.somehospital.data.thread.WorkExecutor;
@@ -62,6 +60,7 @@ public class HospitalLocalDataSourceImpl implements HospitalLocalDataSource {
         WorkExecutor.getInstance().execute(new ExecutorRunnable<>(new ExecutorCallBack<Void>() {
             @Override
             public Void doInBackGround() {
+                if (jsonFile.exists()) jsonFile.delete();
                 String jsonString = gson.toJson(cityInfos).toString();
                 FileUtils.saveStrToFile(jsonString,jsonFile.getAbsolutePath(),"UTF-8");
                 return null;
@@ -72,20 +71,10 @@ public class HospitalLocalDataSourceImpl implements HospitalLocalDataSource {
 
             }
         }));
-        File destFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),"HospitalsGeoInfo.json");
-        String destJson = gson.toJson(cityInfos);
-        FileWriter fileWriter = null;
-        try {
-            fileWriter = new FileWriter(destFile);
-            fileWriter.write(destJson);
-            fileWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
-    public void getHospitals(final HospitalDataSource.LoadHospitalsCallBack callBack) {
+    public void getHospitals(final HospitalDataSource.SimpleCallBack<List<CityInfo>> callBack) {
         WorkExecutor.getInstance().execute(new ExecutorRunnable<>(new ExecutorCallBack<List<CityInfo>>() {
             @Override
             public List<CityInfo> doInBackGround() {
@@ -101,7 +90,7 @@ public class HospitalLocalDataSourceImpl implements HospitalLocalDataSource {
 
             @Override
             public void onPostExecute(List<CityInfo> cityInfos) {
-                callBack.onLoadSucess(cityInfos);
+                callBack.onSuccess(cityInfos);
             }
         }));
     }

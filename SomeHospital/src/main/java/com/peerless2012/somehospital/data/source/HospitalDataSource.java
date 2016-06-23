@@ -1,6 +1,7 @@
 package com.peerless2012.somehospital.data.source;
 
 import com.peerless2012.somehospital.data.bean.CityInfo;
+import com.peerless2012.somehospital.data.bean.HospitalInfo;
 import com.peerless2012.somehospital.data.bean.VersionInfo;
 import java.util.List;
 
@@ -13,17 +14,16 @@ import java.util.List;
  */
 public interface HospitalDataSource {
 
-    interface CheckDbCallBack{
-        void onCheckSucess(VersionInfo versionInfo);
-        void onFaild();
+    interface SimpleCallBack<D>{
+        void onSuccess(D d);
+        void onFaild(int errorCode,String errorMsg);
     }
 
-    interface LoadHospitalsCallBack{
-        void onLoadSucess(List<CityInfo> cityInfos);
-        void onFaild();
-    }
+    void checkDbVersion(SimpleCallBack<VersionInfo> callBack);
 
-    void checkDbVersion(CheckDbCallBack callBack);
+    void loadHospitalsWithGeo(SimpleCallBack<List<CityInfo>> callBack);
 
-    void loadHospitalsWithGeo(LoadHospitalsCallBack callBack);
+    void loadHospitalsWithCityName(String cityName,SimpleCallBack<List<HospitalInfo>> callBack);
+
+    void loadHospitalsWithKeyWord(String keyWord,SimpleCallBack<List<HospitalInfo>> callBack);
 }

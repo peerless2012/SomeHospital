@@ -1,5 +1,8 @@
 package com.peerless2012.somehospital.data.bean;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +14,12 @@ import java.util.List;
  * @Description :
  */
 public class CityInfo {
+    @SerializedName("cityName")
+    @Expose
     private String cityName;
+
+    @SerializedName("hospitalInfos")
+    @Expose
     private List<HospitalInfo> hospitalInfos;
 
     @Override

@@ -22,7 +22,7 @@ public class HospitalSearchSuggestion implements SearchSuggestion {
 
     @Override
     public String getBody() {
-        return null;
+        return hospitalInfo.getName();
     }
 
     @Override
@@ -39,5 +39,17 @@ public class HospitalSearchSuggestion implements SearchSuggestion {
     public void writeToParcel(Parcel dest, int flags) {
 
     }
+
+    public final static Creator<HospitalSearchSuggestion> CREATOR = new Creator<HospitalSearchSuggestion>() {
+        @Override
+        public HospitalSearchSuggestion createFromParcel(Parcel source) {
+            return null;
+        }
+
+        @Override
+        public HospitalSearchSuggestion[] newArray(int size) {
+            return new HospitalSearchSuggestion[0];
+        }
+    };
 
 }

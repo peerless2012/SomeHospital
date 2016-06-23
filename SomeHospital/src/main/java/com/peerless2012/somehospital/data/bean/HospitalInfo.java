@@ -1,5 +1,7 @@
 package com.peerless2012.somehospital.data.bean;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import java.util.Arrays;
 /**
  * @author peerless2012
@@ -9,11 +11,28 @@ import java.util.Arrays;
  * @Description :
  */
 public class HospitalInfo {
+    @SerializedName("name")
+    @Expose
     private String name;
+
+    @SerializedName("phones")
+    @Expose
     private String[] phones;
+
+    @SerializedName("websets")
+    @Expose
     private String[] websets;
+
+    @SerializedName("address")
+    @Expose
     private String address;
+
+    @SerializedName("proofs")
+    @Expose
     private String[] proofs;
+
+    @SerializedName("geo")
+    @Expose
     private Geo geo;
     public String getName() {
         return name;

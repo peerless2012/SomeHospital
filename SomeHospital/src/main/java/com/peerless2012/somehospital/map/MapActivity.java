@@ -1,16 +1,18 @@
 package com.peerless2012.somehospital.map;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcel;
+import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+import android.widget.TextView;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -21,28 +23,36 @@ import com.amap.api.maps.AMapOptions;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
+import com.amap.api.maps.model.BitmapDescriptor;
+import com.amap.api.maps.model.BitmapDescriptorCreator;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.peerless2012.somehospital.R;
 import com.peerless2012.somehospital.base.BaseActivity;
+import com.peerless2012.somehospital.data.bean.Geo;
 import com.peerless2012.somehospital.data.bean.HospitalInfo;
 import com.peerless2012.somehospital.data.bean.HospitalSearchSuggestion;
 import com.peerless2012.somehospital.utils.GeoGenerateUtils;
 import com.peerless2012.somehospital.widget.MapControl;
-
 import java.util.ArrayList;
 import java.util.List;
-
 /**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
+* @Author peerless2012
+* @Email peerless2012@126.com
+* @DateTime 2016/6/13 10:24
+* @Version V1.0
+* @Description:
+*/
 public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.MapPresenter>
         implements LocationSource,AMapLocationListener,AMap.OnMapLoadedListener
-                    ,MapContract.MapView{
+                    ,MapContract.MapView,AMap.OnMarkerClickListener{
 
+    private static final String TAG = "MapActivity";
     private FloatingSearchView mFloatSearchView;
 
     private View contentPanel;
@@ -60,7 +70,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
 
     private MapControl mMapControl;
 
-    private MapContract.MapPresenter mMapPresenter;
+    private HospitalInfoWindowAdapter mInfoWindowAdapter;
 
     @Override
     public MapContract.MapView getPresenterView() {
@@ -69,7 +79,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
 
     @Override
     public MapContract.MapPresenter getPresenter() {
-        return null;
+        return new MapPresenter(this);
     }
 
     @Override
@@ -112,7 +122,8 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         mFloatSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
             @Override
             public void onSearchTextChanged(String oldQuery, String newQuery) {
-                mMapPresenter.searchKeyWord(newQuery);
+                if (newQuery.length() <2) return;
+                mPresenter.searchKeyWord(newQuery);
             }
         });
 
@@ -126,9 +137,8 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
 
     @Override
     protected void initData() {
-        mMapPresenter = new MapPresenter();
-        mMapPresenter.attach(this);
-        mMapPresenter.initData();
+        mInfoWindowAdapter = new HospitalInfoWindowAdapter();
+        mAMap.setInfoWindowAdapter(mInfoWindowAdapter);
     }
 
     /**
@@ -155,6 +165,8 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         uiSettings.setCompassEnabled(false);
         // aMap.setMyLocationType()
         mAMap.setOnMapLoadedListener(this);
+        mAMap.setOnMarkerClickListener(this);
+
     }
 
     @Override
@@ -165,16 +177,13 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }else if (id == R.id.action_generate_data){
-            generateGeo();
+//            generateGeo();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void generateGeo() {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-//        progressDialog.setMax();
-        //HospitalsInfo.json
         new Thread(){
             @Override
             public void run() {
@@ -205,9 +214,9 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
 
     @Override
     protected void onDestroy() {
-        mMapPresenter.detach();
         mMapView.onDestroy();
         mMapControl.detachMap();
+        mlocationClient.stopLocation();
         mAMap.setMyLocationEnabled(false);
         super.onDestroy();
     }
@@ -257,6 +266,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     public void onLocationChanged(AMapLocation aMapLocation) {
         if (mListener != null && aMapLocation != null) {
             if (aMapLocation.getErrorCode() == 0) {
+                mPresenter.initData(aMapLocation.getCity());
                 mListener.onLocationChanged(aMapLocation);// 显示系统小蓝点
 //                mAMap.setMyLocationEnabled(false);
                 mlocationClient.stopLocation();
@@ -271,7 +281,6 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     public void onMapLoaded() {
         mAMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
         mMapControl.attachMap(mAMap);
-        mMapPresenter.initData();
     }
 
     @Override
@@ -285,6 +294,24 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
 
     @Override
     public void onDataLoaded(List<HospitalInfo> hospitalInfos) {
+        mAMap.clear();
+        if (hospitalInfos != null){
+            int size = hospitalInfos.size();
+            for (int i = 0; i < size; i++) {
+                HospitalInfo hospitalInfo = hospitalInfos.get(i);
+                Bitmap hospitalBitmap = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
+                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hospitalBitmap);
+                MarkerOptions markerOptions = new MarkerOptions();
+                Geo geo = hospitalInfo.getGeo();
+                markerOptions.position(new LatLng(geo.getLatitude(),geo.getLongitude()));
+                markerOptions.icon(bitmapDescriptor);
+                markerOptions.snippet("");// 否则不显示InfoWindow
+                Marker marker = mAMap.addMarker(markerOptions);
+                marker.setObject(hospitalInfo);
+            }
+        }else {
+            // 数据为空
+        }
 
     }
 
@@ -308,4 +335,41 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
 
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        HospitalInfo hospitalInfo = (HospitalInfo) marker.getObject();
+        Log.i(TAG, "onMarkerClick: "+ hospitalInfo.toString());
+        marker.showInfoWindow();
+        return false;
+    }
+
+
+    class HospitalInfoWindowAdapter implements AMap.InfoWindowAdapter{
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            View infoWindow = getLayoutInflater().inflate(R.layout.view_infowindow, mMapView, false);
+            HospitalInfo hospitalInfo = (HospitalInfo) marker.getObject();
+            ((TextView)infoWindow.findViewById(R.id.hospital_name)).setText(hospitalInfo.getName());
+            ((TextView)infoWindow.findViewById(R.id.hospital_address)).setText(hospitalInfo.getAddress());
+            String[] proofs = hospitalInfo.getProofs();
+            StringBuilder proofBuilder = null;
+            if (proofs != null && proofs.length > 0){
+                proofBuilder = new StringBuilder();
+                for (int i = 0; i < proofs.length; i++) {
+                    proofBuilder.append(proofs[i]);
+                    if (i < proofs.length -1) proofBuilder.append("\n");
+                }
+            }else {
+                proofBuilder = new StringBuilder("无");
+            }
+            ((TextView)infoWindow.findViewById(R.id.hospital_pro)).setText(Html.fromHtml(proofBuilder.toString()));
+            return infoWindow;
+        }
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            return null;
+        }
+    }
 }

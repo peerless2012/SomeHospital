@@ -18,12 +18,12 @@ interface SplashContract {
 
         void onDbNotNeedUpdate();
 
-        void onDbUpdated(int newVersion);
+        void onDbUpdated();
     }
 
     interface SplashPresenter extends BasePresenter<SplashView>{
 
-        void checkDbVersion(int localVersion);
+        void checkDbVersion();
 
         void verifyDb();
     }

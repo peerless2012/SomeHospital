@@ -14,6 +14,6 @@ public interface HospitalLocalDataSource {
 
     void saveHospitals(List<CityInfo> cityInfos);
 
-    void getHospitals(HospitalDataSource.LoadHospitalsCallBack callBack);
+    void getHospitals(HospitalDataSource.SimpleCallBack<List<CityInfo>> callBack);
 
 }

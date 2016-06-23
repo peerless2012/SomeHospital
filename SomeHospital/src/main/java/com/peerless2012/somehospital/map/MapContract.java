@@ -23,7 +23,7 @@ public interface MapContract {
 
     interface MapPresenter extends BasePresenter<MapView>{
 
-        void initData();
+        void initData(String cityName);
 
         void searchKeyWord(String keyword);
     }

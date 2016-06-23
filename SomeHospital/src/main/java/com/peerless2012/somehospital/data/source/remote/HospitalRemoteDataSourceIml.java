@@ -2,17 +2,14 @@ package com.peerless2012.somehospital.data.source.remote;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
 import com.peerless2012.netlibrary.HttpUtils;
-import com.peerless2012.netlibrary.OkHttpUtils;
 import com.peerless2012.netlibrary.callback.OkCallBack;
 import com.peerless2012.netlibrary.callback.OkInnerWork;
-import com.peerless2012.netlibrary.response.AbsResponse;
 import com.peerless2012.somehospital.data.RequestAndResponsePara.CheckDbVersionRequest;
+import com.peerless2012.somehospital.data.RequestAndResponsePara.LoadHospitalsRequest;
 import com.peerless2012.somehospital.data.bean.CityInfo;
 import com.peerless2012.somehospital.data.bean.VersionInfo;
 import com.peerless2012.somehospital.data.source.HospitalDataSource;
-import com.peerless2012.somehospital.data.source.HospitalLocalDataSource;
 import com.peerless2012.somehospital.data.source.HospitalRemoteDataSource;
 import com.peerless2012.somehospital.data.source.local.HospitalLocalDataSourceImpl;
 
@@ -54,25 +51,37 @@ public class HospitalRemoteDataSourceIml implements HospitalRemoteDataSource{
         sInst = null;
     }
 
-    @Override
-    public void loadHospitalsWithGeo(HospitalDataSource.LoadHospitalsCallBack callBack, OkInnerWork<List<CityInfo>> innerWork) {
-
-    }
 
     @Override
-    public void checkDbVersion(final HospitalDataSource.CheckDbCallBack callBack) {
+    public void checkDbVersion(final HospitalDataSource.SimpleCallBack callBack) {
         CheckDbVersionRequest request = new CheckDbVersionRequest();
         HttpUtils.getInstance().asyncExcute(request, new OkCallBack<VersionInfo>() {
             @Override
             public void onFail(int errorCode, String errorMsg) {
-                callBack.onFaild();
+                callBack.onFaild(errorCode,errorMsg);
             }
 
             @Override
             public void onScuss(VersionInfo versionInfo) {
-                callBack.onCheckSucess(versionInfo);
+                callBack.onSuccess(versionInfo);
             }
         });
+
     }
 
+    @Override
+    public void loadHospitalsWithGeo(final HospitalDataSource.SimpleCallBack callBack, OkInnerWork<List<CityInfo>> innerWork) {
+        final LoadHospitalsRequest request = new LoadHospitalsRequest();
+        HttpUtils.getInstance().asyncExcute(request, new OkCallBack<List<CityInfo>>() {
+            @Override
+            public void onFail(int errorCode, String errorMsg) {
+                callBack.onFaild(errorCode,errorMsg);
+            }
+
+            @Override
+            public void onScuss(List<CityInfo> response) {
+                callBack.onSuccess(response);
+            }
+        }, innerWork);
+    }
 }

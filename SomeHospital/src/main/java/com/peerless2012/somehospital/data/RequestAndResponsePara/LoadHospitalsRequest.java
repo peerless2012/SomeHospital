@@ -1,6 +1,11 @@
 package com.peerless2012.somehospital.data.RequestAndResponsePara;
 
+import com.google.common.reflect.TypeToken;
+import com.peerless2012.netlibrary.common.Method;
 import com.peerless2012.netlibrary.request.JsonRequest;
+import com.peerless2012.somehospital.data.bean.CityInfo;
+import java.lang.reflect.Type;
+import java.util.List;
 
 
 /**
@@ -10,16 +15,27 @@ import com.peerless2012.netlibrary.request.JsonRequest;
  * @Version V1.0
  * @Description :
  */
-public class LoadHospitalsRequest extends JsonRequest<LoadHospitalsResult>{
-
+public class LoadHospitalsRequest extends JsonRequest<List<CityInfo>>{
 
     @Override
-    public String getUrl() {
-        return "https://raw.githubusercontent.com/peerless2012/SomeHospital/master/data/HospitalsGeoInfo.json";
+    public String getMethod() {
+        return Method.GET;
     }
 
     @Override
-    protected Class<LoadHospitalsResult> getResultClass() {
-        return LoadHospitalsResult.class;
+    public String getUrl() {
+//        return "https://raw.githubusercontent.com/peerless2012/SomeHospital/master/data/HospitalsGeoInfo.json";
+        return "http://192.168.31.201:8080/data/HospitalsGeoInfo.json";
+    }
+
+
+    @Override
+    protected Type getResultType() {
+        return new TypeToken<List<CityInfo>>(){}.getType();
+    }
+
+    @Override
+    protected Class<List<CityInfo>> getResultClass() {
+        return null;
     }
 }
