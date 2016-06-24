@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -24,6 +26,7 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapOptions;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
@@ -54,7 +57,7 @@ import java.util.List;
 */
 public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.MapPresenter>
         implements LocationSource,AMapLocationListener,AMap.OnMapLoadedListener
-                    ,MapContract.MapView,AMap.OnMarkerClickListener{
+                    ,MapContract.MapView,AMap.OnMarkerClickListener,AMap.OnMapClickListener{
 
     private static final String TAG = "MapActivity";
     private FloatingSearchView mFloatSearchView;
@@ -77,6 +80,10 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     private HospitalInfoWindowAdapter mInfoWindowAdapter;
 
     private LatLng mLatLng;
+
+    private LatLng mCurrentLatLng;
+
+    private Marker mMarker;
 
     @Override
     public MapContract.MapView getPresenterView() {
@@ -109,19 +116,13 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         mFloatSearchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
             @Override
             public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
-
+                HospitalSearchSuggestion suggestion = (HospitalSearchSuggestion) searchSuggestion;
+                addNewMarker(suggestion.getHospitalInfo());
             }
 
             @Override
             public void onSearchAction() {
 
-            }
-        });
-
-        mFloatSearchView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                return false;
             }
         });
 
@@ -136,7 +137,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         mFloatSearchView.setOnMenuItemClickListener(new FloatingSearchView.OnMenuItemClickListener() {
             @Override
             public void onActionMenuItemSelected(MenuItem item) {
-                generateGeo();
+                //
             }
         });
     }
@@ -155,10 +156,10 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         MyLocationStyle myLocationStyle = new MyLocationStyle();
         myLocationStyle.myLocationIcon(BitmapDescriptorFactory
                 .fromResource(R.drawable.person));// 设置小蓝点的图标
-        myLocationStyle.strokeColor(Color.BLACK);// 设置圆形的边框颜色
-        myLocationStyle.radiusFillColor(Color.argb(100, 0, 0, 180));// 设置圆形的填充颜色
+//        myLocationStyle.strokeColor(Color.BLACK);// 设置圆形的边框颜色
+//        myLocationStyle.radiusFillColor(Color.argb(100, 0, 0, 180));// 设置圆形的填充颜色
         // myLocationStyle.anchor(int,int)//设置小蓝点的锚点
-        myLocationStyle.strokeWidth(1.0f);// 设置圆形的边框粗细
+//        myLocationStyle.strokeWidth(1.0f);// 设置圆形的边框粗细
         mAMap.setMyLocationStyle(myLocationStyle);
         mAMap.setLocationSource(this);// 设置定位监听
         UiSettings uiSettings = mAMap.getUiSettings();
@@ -172,6 +173,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         // aMap.setMyLocationType()
         mAMap.setOnMapLoadedListener(this);
         mAMap.setOnMarkerClickListener(this);
+        mAMap.setOnMapClickListener(this);
 
     }
 
@@ -181,9 +183,6 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         if (id == android.R.id.home) {
             // This ID represents the Home or Up button.
             NavUtils.navigateUpFromSameTask(this);
-            return true;
-        }else if (id == R.id.action_generate_data){
-//            generateGeo();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -284,6 +283,10 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         }
     }
 
+    private void animateToNewPosition(LatLng newLatlng){
+        mAMap.animateCamera(CameraUpdateFactory.changeLatLng(newLatlng));
+    }
+
     @Override
     public void onMapLoaded() {
         mAMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
@@ -295,7 +298,13 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         if (mFloatSearchView.isSearchBarFocused()){
             mFloatSearchView.clearSearchFocus();
         }else {
-            super.onBackPressed();
+            if (mCurrentLatLng != null && mLatLng != null
+                    && (mCurrentLatLng.latitude != mLatLng.latitude
+                        || mCurrentLatLng.longitude != mLatLng.longitude)) {
+                animateToNewPosition(mLatLng);
+            }else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -303,26 +312,30 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     public void onDataLoaded(List<HospitalInfo> hospitalInfos) {
         mAMap.clear();
 
-        initCurrentLocation();
+//        initCurrentLocation();
 
         if (hospitalInfos != null){
             int size = hospitalInfos.size();
             for (int i = 0; i < size; i++) {
                 HospitalInfo hospitalInfo = hospitalInfos.get(i);
-//                Bitmap hospitalBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.hospital);
-                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.hospital);
-                MarkerOptions markerOptions = new MarkerOptions();
-                Geo geo = hospitalInfo.getGeo();
-                markerOptions.position(new LatLng(geo.getLatitude(),geo.getLongitude()));
-                markerOptions.icon(bitmapDescriptor);
-                markerOptions.snippet("");// 否则不显示InfoWindow
-                Marker marker = mAMap.addMarker(markerOptions);
-                marker.setObject(hospitalInfo);
+                generateMarker(hospitalInfo);
             }
         }else {
             // 数据为空
         }
 
+    }
+
+    private Marker generateMarker(HospitalInfo hospitalInfo){
+        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.hospital);
+        MarkerOptions markerOptions = new MarkerOptions();
+        Geo geo = hospitalInfo.getGeo();
+        markerOptions.position(new LatLng(geo.getLatitude(),geo.getLongitude()));
+        markerOptions.icon(bitmapDescriptor);
+        markerOptions.snippet("");// 否则不显示InfoWindow
+        Marker marker = mAMap.addMarker(markerOptions);
+        marker.setObject(hospitalInfo);
+        return marker;
     }
 
     private void initCurrentLocation(){
@@ -332,6 +345,41 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         markerOptions.icon(bitmapDescriptor);
         Marker marker = mAMap.addMarker(markerOptions);
         marker.setObject(null);
+    }
+
+
+    private void addNewMarker(HospitalInfo hospitalInfo) {
+        if (hospitalInfo.getGeo() == null){
+            Toast.makeText(this,"暂无该医院位置",Toast.LENGTH_LONG).show();
+            return;
+        }
+        List<Marker> mapScreenMarkers = mAMap.getMapScreenMarkers();
+        Marker preMarker = null;
+        if (mapScreenMarkers != null && mapScreenMarkers.size() > 0){
+            int size = mapScreenMarkers.size();
+            Geo geo = hospitalInfo.getGeo();
+            LatLng latlng = null;
+            for (int i = 0; i < size; i++) {
+                latlng = mapScreenMarkers.get(i).getPosition();
+                if (latlng != null
+                        && latlng.latitude == geo.getLatitude()
+                        && latlng.longitude == geo.getLongitude()) {
+                    preMarker = mapScreenMarkers.get(i);
+                    break;
+                }
+            }
+        }
+
+        if (preMarker != null) {
+            preMarker.showInfoWindow();
+        }else {
+            preMarker = generateMarker(hospitalInfo);
+            preMarker.showInfoWindow();
+        }
+
+        mAMap.animateCamera(CameraUpdateFactory.changeLatLng(preMarker.getPosition()));
+
+        mCurrentLatLng = preMarker.getPosition();
     }
 
     @Override
@@ -357,11 +405,19 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     @Override
     public boolean onMarkerClick(Marker marker) {
         HospitalInfo hospitalInfo = (HospitalInfo) marker.getObject();
-        if (hospitalInfo == null){
-            return true;
-        }else {
+        if (hospitalInfo != null){
             marker.showInfoWindow();
-            return false;
+            animateToNewPosition(marker.getPosition());
+        }
+        mMarker = marker;
+        mCurrentLatLng = mMarker.getPosition();
+        return true;
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        if (mMarker != null && mMarker.isInfoWindowShown()) {
+            mMarker.hideInfoWindow();
         }
     }
 

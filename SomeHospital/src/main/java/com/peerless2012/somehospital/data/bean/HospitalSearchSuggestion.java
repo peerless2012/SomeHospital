@@ -40,6 +40,10 @@ public class HospitalSearchSuggestion implements SearchSuggestion {
 
     }
 
+    public HospitalInfo getHospitalInfo() {
+        return hospitalInfo;
+    }
+
     public final static Creator<HospitalSearchSuggestion> CREATOR = new Creator<HospitalSearchSuggestion>() {
         @Override
         public HospitalSearchSuggestion createFromParcel(Parcel source) {
