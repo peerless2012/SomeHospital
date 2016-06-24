@@ -2,6 +2,7 @@ package com.peerless2012.somehospital.splash;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 
 import com.peerless2012.somehospital.data.bean.CityInfo;
 import com.peerless2012.somehospital.data.bean.VersionInfo;
@@ -20,6 +21,8 @@ public class SplashPresenter implements SplashContract.SplashPresenter{
 
     private final static String DB_VERSION = "DbVersion";
 
+    private final static String DB_CHECK_TIME = "DbCheckTime";
+
     private HospitalRepository mHospitalRepository;
 
     private SharedPreferences mPreferences;
@@ -34,33 +37,44 @@ public class SplashPresenter implements SplashContract.SplashPresenter{
     @Override
     public void checkDbVersion() {
         final int localVersion = mPreferences.getInt(DB_VERSION, 0);
-        mHospitalRepository.checkDbVersion(new HospitalDataSource.SimpleCallBack<VersionInfo>() {
-            @Override
-            public void onSuccess(final VersionInfo versionInfo) {
-                if (versionInfo.getDbversion() > localVersion){
-                    mHospitalRepository.loadHospitalsWithGeo(new HospitalDataSource.SimpleCallBack<List<CityInfo>>() {
-                        @Override
-                        public void onSuccess(List<CityInfo> cityInfos) {
-                            mPreferences.edit().putInt(DB_VERSION,versionInfo.getDbversion()).apply();
-                            mSplashView.onDbUpdated();
-                        }
+        long preTime = mPreferences.getLong(DB_CHECK_TIME, System.currentTimeMillis());
+        if (System.currentTimeMillis() - preTime > 12 * 60 * 60 * 1000){
+            mHospitalRepository.checkDbVersion(new HospitalDataSource.SimpleCallBack<VersionInfo>() {
+                @Override
+                public void onSuccess(final VersionInfo versionInfo) {
+                    if (versionInfo.getDbversion() > localVersion){
+                        mHospitalRepository.loadHospitalsWithGeo(new HospitalDataSource.SimpleCallBack<List<CityInfo>>() {
+                            @Override
+                            public void onSuccess(List<CityInfo> cityInfos) {
+                                mPreferences.edit()
+                                        .putInt(DB_VERSION,versionInfo.getDbversion())
+                                        .putLong(DB_CHECK_TIME,System.currentTimeMillis())
+                                        .apply();
 
-                        @Override
-                        public void onFaild(int errorCode, String errorMsg) {
-                            mSplashView.onCheckFaild();
-                        }
-                    });
-                }else {
-                    // 已经是最新，无需更新
-                    mSplashView.onDbNotNeedUpdate();
+                                mSplashView.onDbUpdated();
+
+                            }
+
+                            @Override
+                            public void onFaild(int errorCode, String errorMsg) {
+                                mSplashView.onCheckFaild();
+                            }
+                        });
+                    }else {
+                        // 已经是最新，无需更新
+                        mSplashView.onDbNotNeedUpdate();
+                    }
                 }
-            }
 
-            @Override
-            public void onFaild(int errorCode, String errorMsg) {
-                mSplashView.onCheckFaild();
-            }
-        });
+                @Override
+                public void onFaild(int errorCode, String errorMsg) {
+                    mSplashView.onCheckFaild();
+                }
+            });
+        }else {
+            mSplashView.onDbNotNeedUpdate();
+        }
+
     }
 
     @Override

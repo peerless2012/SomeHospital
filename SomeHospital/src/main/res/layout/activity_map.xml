@@ -12,28 +12,33 @@
         android:layout_height="match_parent">
     </com.amap.api.maps.MapView>
 
-    <com.peerless2012.somehospital.widget.MapControl
+    <RelativeLayout
         android:fitsSystemWindows="true"
-        android:id="@+id/map_control"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="right|bottom"/>
-
-    <com.arlib.floatingsearchview.FloatingSearchView
-        android:fitsSystemWindows="true"
-        android:id="@+id/floating_search_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:floatingSearch_dismissOnOutsideTouch="true"
-        app:floatingSearch_leftActionMode="showHamburger"
-        app:floatingSearch_menu="@menu/main"
-        app:floatingSearch_searchBarMarginLeft="@dimen/search_view_inset"
-        app:floatingSearch_searchBarMarginRight="@dimen/search_view_inset"
-        app:floatingSearch_searchBarMarginTop="@dimen/search_view_inset"
-        app:floatingSearch_searchHint="Search..."
-        app:floatingSearch_showSearchKey="false"/>
+        android:layout_height="match_parent">
+        <com.peerless2012.somehospital.widget.MapControl
+            android:id="@+id/map_control"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"/>
+
+        <com.arlib.floatingsearchview.FloatingSearchView
+            android:id="@+id/floating_search_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:floatingSearch_dismissOnOutsideTouch="true"
+            app:floatingSearch_leftActionMode="showHamburger"
+            app:floatingSearch_menu="@menu/main"
+            app:floatingSearch_searchBarMarginLeft="@dimen/search_view_inset"
+            app:floatingSearch_searchBarMarginRight="@dimen/search_view_inset"
+            app:floatingSearch_searchBarMarginTop="@dimen/search_view_inset"
+            app:floatingSearch_searchHint="Search..."
+            app:floatingSearch_showSearchKey="false"/>
+    </RelativeLayout>
+
 
 
 
