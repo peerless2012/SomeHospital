@@ -1,6 +1,8 @@
 package com.peerless2012.somehospital.map;
 
 import android.content.Context;
+
+import com.peerless2012.somehospital.data.bean.CityInfo;
 import com.peerless2012.somehospital.data.bean.HospitalInfo;
 import com.peerless2012.somehospital.data.source.HospitalDataSource;
 import com.peerless2012.somehospital.data.source.HospitalRepository;
@@ -49,6 +51,22 @@ public class MapPresenter implements MapContract.MapPresenter{
             @Override
             public void onFaild(int errorCode, String errorMsg) {
                 if (mMapView != null) mMapView.onKeyWordSearched(null);
+            }
+        });
+    }
+
+    @Override
+    public void refreshData() {
+        mHospitalRepository.reloadHospitalsWithGeo(new HospitalDataSource.SimpleCallBack<List<CityInfo>>() {
+            @Override
+            public void onSuccess(List<CityInfo> cityInfos) {
+                mMapView.onDataRefreshed(true);
+                mHospitalRepository.invalidateCache();
+            }
+
+            @Override
+            public void onFaild(int errorCode, String errorMsg) {
+                mMapView.onDataRefreshed(false);
             }
         });
     }

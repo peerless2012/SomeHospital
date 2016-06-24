@@ -74,20 +74,7 @@ public class HospitalRepository implements HospitalDataSource{
                 @Override
                 public void onSuccess(List<CityInfo> cityInfos) {
                     if (cityInfos == null){
-                        mRemoteDataSource.loadHospitalsWithGeo(callBack, new OkInnerWork<List<CityInfo>>() {
-                            @Override
-                            public void preDo(AbsRequest<List<CityInfo>> request) {
-
-                            }
-
-                            @Override
-                            public void afterDo(AbsResponse<List<CityInfo>> response) {
-                                // 存储数据
-                                if (response != null && response.isSuccess()){
-                                    mLocalDataSource.saveHospitals(response.getData());
-                                }
-                            }
-                        });
+                        reloadHospitalsWithGeo(callBack);
                     }else {
                         mCityInfos = cityInfos;
                         callBack.onSuccess(cityInfos);
@@ -102,6 +89,25 @@ public class HospitalRepository implements HospitalDataSource{
         }
 
     }
+
+    @Override
+    public void reloadHospitalsWithGeo(SimpleCallBack<List<CityInfo>> callBack) {
+        mRemoteDataSource.loadHospitalsWithGeo(callBack, new OkInnerWork<List<CityInfo>>() {
+            @Override
+            public void preDo(AbsRequest<List<CityInfo>> request) {
+
+            }
+
+            @Override
+            public void afterDo(AbsResponse<List<CityInfo>> response) {
+                // 存储数据
+                if (response != null && response.isSuccess()){
+                    mLocalDataSource.saveHospitals(response.getData());
+                }
+            }
+        });
+    }
+
 
     @Override
     public void loadHospitalsWithCityName(final String cityName, final SimpleCallBack<List<HospitalInfo>> callBack) {
@@ -157,6 +163,10 @@ public class HospitalRepository implements HospitalDataSource{
                 callBack.onFaild(errorCode,errorMsg);
             }
         });
+    }
+
+    public void invalidateCache(){
+        mCacheIsDirty = true;
     }
 }
 

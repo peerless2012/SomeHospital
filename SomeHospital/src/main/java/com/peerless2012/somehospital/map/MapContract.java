@@ -19,6 +19,8 @@ public interface MapContract {
         void onDataLoaded(List<HospitalInfo> hospitalInfos);
 
         void onKeyWordSearched(List<HospitalInfo> hospitalInfos);
+
+        void onDataRefreshed(boolean success);
     }
 
     interface MapPresenter extends BasePresenter<MapView>{
@@ -26,5 +28,7 @@ public interface MapContract {
         void initData(String cityName);
 
         void searchKeyWord(String keyword);
+
+        void refreshData();
     }
 }

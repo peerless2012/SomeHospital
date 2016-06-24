@@ -23,6 +23,8 @@ public interface HospitalDataSource {
 
     void loadHospitalsWithGeo(SimpleCallBack<List<CityInfo>> callBack);
 
+    void reloadHospitalsWithGeo(SimpleCallBack<List<CityInfo>> callBack);
+
     void loadHospitalsWithCityName(String cityName,SimpleCallBack<List<HospitalInfo>> callBack);
 
     void loadHospitalsWithKeyWord(String keyWord,SimpleCallBack<List<HospitalInfo>> callBack);

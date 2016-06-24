@@ -2,24 +2,14 @@ package com.peerless2012.somehospital.map;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
@@ -31,7 +21,6 @@ import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptor;
-import com.amap.api.maps.model.BitmapDescriptorCreator;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
@@ -137,7 +126,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         mFloatSearchView.setOnMenuItemClickListener(new FloatingSearchView.OnMenuItemClickListener() {
             @Override
             public void onActionMenuItemSelected(MenuItem item) {
-                //
+                mPresenter.refreshData();
             }
         });
     }
@@ -221,7 +210,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     protected void onDestroy() {
         mMapView.onDestroy();
         mMapControl.detachMap();
-        mlocationClient.stopLocation();
+        if (mlocationClient != null) mlocationClient.stopLocation();
         mAMap.setMyLocationEnabled(false);
         super.onDestroy();
     }
@@ -273,7 +262,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
             if (aMapLocation.getErrorCode() == 0) {
                 mPresenter.initData(aMapLocation.getCity());
                 mListener.onLocationChanged(aMapLocation);// 显示系统小蓝点
-//                mAMap.setMyLocationEnabled(false);
+                mAMap.setMyLocationEnabled(false);
                 mLatLng = new LatLng(aMapLocation.getLatitude(),aMapLocation.getLongitude());
                 mlocationClient.stopLocation();
             } else {
@@ -289,8 +278,8 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
 
     @Override
     public void onMapLoaded() {
-        mAMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
         mMapControl.attachMap(mAMap);
+        mAMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
     }
 
     @Override
@@ -301,7 +290,9 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
             if (mCurrentLatLng != null && mLatLng != null
                     && (mCurrentLatLng.latitude != mLatLng.latitude
                         || mCurrentLatLng.longitude != mLatLng.longitude)) {
+                if (mMarker != null && mMarker.isInfoWindowShown())mMarker.hideInfoWindow();
                 animateToNewPosition(mLatLng);
+                mCurrentLatLng = mLatLng;
             }else {
                 super.onBackPressed();
             }
@@ -312,7 +303,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     public void onDataLoaded(List<HospitalInfo> hospitalInfos) {
         mAMap.clear();
 
-//        initCurrentLocation();
+        initCurrentLocation();
 
         if (hospitalInfos != null){
             int size = hospitalInfos.size();
@@ -320,10 +311,7 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
                 HospitalInfo hospitalInfo = hospitalInfos.get(i);
                 generateMarker(hospitalInfo);
             }
-        }else {
-            // 数据为空
         }
-
     }
 
     private Marker generateMarker(HospitalInfo hospitalInfo){
@@ -398,6 +386,11 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
     }
 
     @Override
+    public void onDataRefreshed(boolean success) {
+        Toast.makeText(this,success ? "数据更新成功！":"数据更新失败！",Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     public void setPresenter(MapContract.MapPresenter presenter) {
 
     }
@@ -408,9 +401,9 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
         if (hospitalInfo != null){
             marker.showInfoWindow();
             animateToNewPosition(marker.getPosition());
+            mMarker = marker;
+            mCurrentLatLng = mMarker.getPosition();
         }
-        mMarker = marker;
-        mCurrentLatLng = mMarker.getPosition();
         return true;
     }
 
