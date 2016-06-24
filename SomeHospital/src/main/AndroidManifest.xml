@@ -31,12 +31,6 @@
             android:value="d764725d88502868121eea087c8ad4b0"/>
 
         <activity
-            android:name=".mainactivity.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
-        <activity
             android:name=".splash.SplashActivity"
             android:theme="@style/AppTheme.FullScreen">
             <intent-filter>
@@ -55,10 +49,7 @@
             android:name=".map.MapActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_map"
-            android:parentActivityName=".mainactivity.MainActivity"
             android:theme="@style/FullscreenTheme">
-
-
         </activity>
 
         <service android:name="com.amap.api.location.APSService" >
