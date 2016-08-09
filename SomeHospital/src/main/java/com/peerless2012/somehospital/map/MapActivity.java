@@ -309,7 +309,9 @@ public class MapActivity extends BaseActivity<MapContract.MapView,MapContract.Ma
             int size = hospitalInfos.size();
             for (int i = 0; i < size; i++) {
                 HospitalInfo hospitalInfo = hospitalInfos.get(i);
-                generateMarker(hospitalInfo);
+                if (hospitalInfo.getGeo() != null){
+                    generateMarker(hospitalInfo);
+                }
             }
         }
     }
