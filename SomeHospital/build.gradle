@@ -1,16 +1,6 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        debug {
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile file('D:/develop/debug.keystore')
-            storePassword 'android'
-        }
-    }
-
-
     /*
     so 文件要么拷贝在libs下，然后用下面的配置。要么放到main/jniLibs下
     sourceSets{
